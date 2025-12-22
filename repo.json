@@ -1,0 +1,8 @@
+{
+    "name": "MovixExtension",
+    "description": "Extension CloudStream pour Movix.club",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://raw.githubusercontent.com/swal-l/DrawCloudStream/builds/plugins.json"
+    ]
+}
