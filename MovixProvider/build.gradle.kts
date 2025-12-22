@@ -18,5 +18,5 @@ cloudstream {
     requiresResources = false
     language = "fr"
 
-    iconUrl = "https://movix.club/assets/movix-CzqwVOTS.png"
+    iconUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1200px-NASA_logo.svg.png"
 }
