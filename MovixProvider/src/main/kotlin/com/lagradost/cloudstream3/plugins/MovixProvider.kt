@@ -1,0 +1,150 @@
+package com.lagradost.cloudstream3.plugins
+
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
+import com.fasterxml.jackson.annotation.JsonProperty
+
+class MovixProvider : MainAPI() {
+    override var mainUrl = "https://movix.club"
+    override var name = "Movix"
+    private val apiUrl = "https://api.movix.club"
+    override val hasMainPage = false
+    override val hasChromecastSupport = true
+    override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie, TvType.Anime)
+
+    // JSON Data Classes
+    data class MovixSearchResponse(
+        val results: List<SearchResultItem>?
+    )
+
+    data class SearchResultItem(
+        val id: Int,
+        val name: String,
+        val poster: String?,
+        val type: String?, // "animes", "movie", "ebook"
+        val year: Int?,
+        @JsonProperty("tmdb_id") val tmdbId: Int?
+    )
+
+    data class SeasonResponse(
+        val success: Boolean,
+        val pagination: SeasonPagination?
+    )
+
+    data class SeasonPagination(
+        val data: List<SeasonItem>?
+    )
+
+    data class SeasonItem(
+        val id: Int,
+        val number: Int,
+        @JsonProperty("episodes_count") val episodesCount: Int?
+    )
+
+    data class EpisodeResponse(
+        val success: Boolean,
+        val pagination: EpisodePagination?
+    )
+
+    data class EpisodePagination(
+        val data: List<EpisodeItem>?
+    )
+
+    data class EpisodeItem(
+        val id: Int,
+        val name: String?,
+        val poster: String?,
+        @JsonProperty("episode_number") val episodeNumber: Int,
+        @JsonProperty("season_number") val seasonNumber: Int,
+        val description: String?,
+        @JsonProperty("primary_video") val primaryVideo: PrimaryVideo?
+    )
+
+    data class PrimaryVideo(
+        val lien: String?
+    )
+    
+    // Movie Download Response (Partial)
+    data class MovieDownloadResponse(
+        val success: Boolean,
+        val all: List<MovieDownloadItem>?
+    )
+    
+    data class MovieDownloadItem(
+        val id: Int,
+        @JsonProperty("host_name") val hostName: String?,
+        val quality: String?
+    )
+
+    override suspend fun search(query: String): List<SearchResponse> {
+        val url = "$apiUrl/api/search?title=$query"
+        val response = app.get(url).parsedSafe<MovixSearchResponse>()
+        
+        return response?.results?.mapNotNull { item ->
+            if (item.type == "ebook") return@mapNotNull null
+            
+            val type = when(item.type) {
+                "movie" -> TvType.Movie
+                "animes" -> TvType.Anime
+                else -> TvType.TvSeries
+            }
+            
+            newTvSeriesSearchResponse(item.name, item.id.toString(), type) {
+                this.posterUrl = item.poster
+                this.year = item.year
+            }
+        } ?: emptyList()
+    }
+
+    override suspend fun load(url: String): LoadResponse? {
+        val id = url
+        
+        // Try fetching seasons
+        val seasonUrl = "$apiUrl/api/darkiworld/seasons/$id"
+        val seasonResponse = app.get(seasonUrl).parsedSafe<SeasonResponse>()
+
+        if (seasonResponse?.success == true && !seasonResponse.pagination?.data.isNullOrEmpty()) {
+            // It's a TV Series
+            val seasons = seasonResponse.pagination.data.sortedBy { it.number }
+            val episodes = ArrayList<Episode>()
+            
+            seasons.forEach { season ->
+                val epUrl = "$apiUrl/api/darkiworld/episodes/$id/${season.number}"
+                val epResponse = app.get(epUrl).parsedSafe<EpisodeResponse>()
+                
+                epResponse?.pagination?.data?.forEach { ep ->
+                    episodes.add(
+                        newEpisode(ep.primaryVideo?.lien ?: "") {
+                            this.name = ep.name
+                            this.season = ep.seasonNumber
+                            this.episode = ep.episodeNumber
+                            this.posterUrl = ep.poster
+                            this.description = ep.description
+                        }
+                    )
+                }
+            }
+            
+            return newTvSeriesLoadResponse("TV Series $id", id, TvType.TvSeries, episodes)
+        } else {
+             // Treat as Movie (Legacy/Fallback)
+             // We use the ID as the data
+             return newMovieLoadResponse("Movie $id", id, TvType.Movie, id)
+        }
+    }
+
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        // If data is a URL (from TV episode), use it
+        if (data.startsWith("http")) {
+             loadExtractor(data, subtitleCallback, callback)
+             return true
+        }
+        
+        return false
+    }
+}
