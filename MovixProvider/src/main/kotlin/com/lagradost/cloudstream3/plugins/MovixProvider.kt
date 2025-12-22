@@ -145,6 +145,37 @@ class MovixProvider : MainAPI() {
              return true
         }
         
+        // Movie: data is the Movie ID (String)
+        val movieId = data
+        val url = "$apiUrl/api/darkiworld/download/movie/$movieId"
+        
+        try {
+            val res = app.get(url).parsedSafe<MovieDownloadResponse>()
+            
+            res?.all?.forEach { item ->
+                // For each download item, we need to decode it to get the link
+                val decodeUrl = "$apiUrl/api/darkiworld/decode/${item.id}"
+                val decodeRes = app.get(decodeUrl).parsedSafe<DecodeResponse>()
+                
+                val link = decodeRes?.embedUrl?.lien
+                if (!link.isNullOrBlank()) {
+                    loadExtractor(link, subtitleCallback, callback)
+                }
+            }
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         return false
     }
+
+    data class DecodeResponse(
+        val success: Boolean,
+        @JsonProperty("embed_url") val embedUrl: EmbedUrl?
+    )
+
+    data class EmbedUrl(
+        val lien: String?
+    )
 }
