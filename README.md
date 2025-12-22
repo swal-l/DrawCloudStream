@@ -11,13 +11,15 @@ To install this plugin in CloudStream:
 3. Click **Add Repository**.
 4. Paste the following URL:
    ```
-   https://raw.githubusercontent.com/swal-l/DrawCloudStream/builds/plugins.json
+   https://raw.githubusercontent.com/swal-l/DrawCloudStream/builds/repo.json
    ```
 5. Install **Movix** from the list.
 
+*(If the above fails, you can try: `https://raw.githubusercontent.com/swal-l/DrawCloudStream/builds/plugins.json`)*
+
 ## Features
-- **Movies**: Browse and search movies (metadata only).
-- **TV Series**: Full support with Seasons, Episodes, and Video Links.
+- **Movies**: Full support (Search, Directory, Video Links).
+- **TV Series**: Full support (Seasons, Episodes, Video Links).
 
 ## Disclaimer
 This extension is for educational purposes only.
