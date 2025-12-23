@@ -43,6 +43,7 @@ class MovixProvider : MainAPI() {
         val name: String,
         val poster: String?,
         val type: String?, // "animes", "movie", "ebook"
+        @JsonProperty("model_type") val modelType: String?,
         val year: Int?,
         @JsonProperty("tmdb_id") val tmdbId: Int?
     )
@@ -102,10 +103,12 @@ class MovixProvider : MainAPI() {
         val headers = mapOf("User-Agent" to userAgent)
         val response = app.get(url, headers = headers).parsedSafe<MovixSearchResponse>()
         
-        return response?.results?.mapNotNull { item ->
+        val validResults = response?.results?.mapNotNull { item ->
             if (item.type == "ebook") return@mapNotNull null
             
-            val type = when(item.type) {
+            val typeStr = item.type ?: item.modelType
+            
+            val type = when(typeStr) {
                 "movie" -> TvType.Movie
                 "animes" -> TvType.Anime
                 else -> TvType.TvSeries
@@ -116,6 +119,14 @@ class MovixProvider : MainAPI() {
                 this.year = item.year
             }
         } ?: emptyList()
+
+        // DEBUG: Always add a dummy item to verify the UI list is working
+        val dummyItem = newTvSeriesSearchResponse("DEBUG: Test Item (Si vous voyez ça, le plugin marche)", "12345", TvType.Movie) {
+             this.posterUrl = "https://movix.club/assets/movix-CzqwVOTS.png"
+             this.year = 2024
+        }
+        
+        return listOf(dummyItem) + validResults
     }
 
     override suspend fun load(url: String): LoadResponse? {
