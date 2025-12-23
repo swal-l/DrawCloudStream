@@ -1,0 +1,23 @@
+[
+    {
+        "iconUrl": "https://movix.club/assets/movix-CzqwVOTS.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/swal-l/DrawCloudStream",
+        "fileSize": 20041,
+        "status": 3,
+        "language": "fr",
+        "authors": [
+            "Antigravity"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime"
+        ],
+        "version": 11,
+        "internalName": "MovixClub",
+        "description": "Extension for Movix.club",
+        "url": "https://raw.githubusercontent.com/swal-l/DrawCloudStream/builds/MovixClub.cs3",
+        "name": "MovixClub"
+    }
+]
