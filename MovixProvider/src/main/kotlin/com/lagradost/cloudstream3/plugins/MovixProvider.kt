@@ -45,7 +45,10 @@ class MovixClubProvider : MainAPI() {
         val type: String?, // "animes", "movie", "ebook"
         @JsonProperty("model_type") val modelType: String?,
         val year: Int?,
-        @JsonProperty("tmdb_id") val tmdbId: Int?
+        @JsonProperty("tmdb_id") val tmdbId: Int?,
+        val description: String?,
+        val backdrop: String?,
+        val rating: Float?
     )
 
     data class SeasonResponse(
@@ -117,16 +120,26 @@ class MovixClubProvider : MainAPI() {
             newTvSeriesSearchResponse(item.name, item.id.toString(), type) {
                 this.posterUrl = item.poster
                 this.year = item.year
+                this.plot = item.description
+                this.posterHeaders = mapOf("User-Agent" to userAgent)
+                
+                // Add rating (CloudStream typically uses 0-100 scale or similar, but passing raw text or int helps)
+                if (item.rating != null) {
+                    this.rating = (item.rating * 1000).toInt() // Convert 5.5 to 5500 for internal reasoning if needed
+                }
+                
+                // Use backdrop if available, otherwise fallback to poster
+                if (!item.backdrop.isNullOrBlank()) {
+                     this.posterUrl = item.poster // Keep poster as main image
+                     // CloudStream might not have a direct property for 'backdrop' in SearchResponse 
+                     // but we can ensure the poster is high quality. 
+                     // Note: SearchResponse usually only shows poster. 
+                     // Detailed views use LoadResponse.
+                }
             }
         } ?: emptyList()
 
-        // DEBUG: Always add a dummy item to verify the UI list is working
-        val dummyItem = newTvSeriesSearchResponse("DEBUG: Test Item (Si vous voyez ça, le plugin marche)", "12345", TvType.Movie) {
-             this.posterUrl = "https://movix.club/assets/movix-CzqwVOTS.png"
-             this.year = 2024
-        }
-        
-        return listOf(dummyItem) + validResults
+        return validResults
     }
 
     override suspend fun load(url: String): LoadResponse? {
