@@ -8,9 +8,27 @@ class MovixProvider : MainAPI() {
     override var mainUrl = "https://movix.club"
     override var name = "Movix"
     private val apiUrl = "https://api.movix.club"
-    override val hasMainPage = false
-    override val hasChromecastSupport = true
+    override val hasMainPage = true
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie, TvType.Anime)
+
+    override val mainPage = mainPageOf(
+        "2025" to "📅 Sorties 2025",
+        "2024" to "📅 Sorties 2024",
+        "series" to "📺 Séries Populaires",
+        "action" to "💥 Films d'Action",
+        "aventure" to "🌍 Aventure",
+        "anime" to "🗾 Animes",
+        "drame" to "🎭 Drame"
+    )
+
+    override suspend fun getMainPage(
+        page: Int,
+        request: MainPageRequest
+    ): HomePageResponse {
+        val query = request.data
+        val searchResults = search(query)
+        return newHomePageResponse(request.name, searchResults)
+    }
 
     // JSON Data Classes
     data class MovixSearchResponse(
