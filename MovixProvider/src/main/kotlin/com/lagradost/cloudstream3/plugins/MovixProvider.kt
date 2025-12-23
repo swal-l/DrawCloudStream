@@ -120,21 +120,11 @@ class MovixClubProvider : MainAPI() {
             newTvSeriesSearchResponse(item.name, item.id.toString(), type) {
                 this.posterUrl = item.poster
                 this.year = item.year
-                this.plot = item.description
                 this.posterHeaders = mapOf("User-Agent" to userAgent)
-                
-                // Add rating (CloudStream typically uses 0-100 scale or similar, but passing raw text or int helps)
-                if (item.rating != null) {
-                    this.rating = (item.rating * 1000).toInt() // Convert 5.5 to 5500 for internal reasoning if needed
-                }
                 
                 // Use backdrop if available, otherwise fallback to poster
                 if (!item.backdrop.isNullOrBlank()) {
-                     this.posterUrl = item.poster // Keep poster as main image
-                     // CloudStream might not have a direct property for 'backdrop' in SearchResponse 
-                     // but we can ensure the poster is high quality. 
-                     // Note: SearchResponse usually only shows poster. 
-                     // Detailed views use LoadResponse.
+                     this.posterUrl = item.poster
                 }
             }
         } ?: emptyList()
