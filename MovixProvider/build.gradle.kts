@@ -4,7 +4,7 @@ dependencies {
 }
 
 // Use an integer for version numbers
-version = 2
+version = 3
 
 cloudstream {
     description = "Extension for Movix.club"
@@ -18,5 +18,5 @@ cloudstream {
     requiresResources = false
     language = "fr"
 
-    iconUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/1200px-NASA_logo.svg.png"
+    iconUrl = "https://movix.club/assets/movix-CzqwVOTS.png"
 }
