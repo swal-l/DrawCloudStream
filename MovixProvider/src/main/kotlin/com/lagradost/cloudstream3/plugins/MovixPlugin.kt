@@ -8,6 +8,6 @@ import android.content.Context
 class MovixPlugin: Plugin() {
     override fun load(context: Context) {
         // All providers should be added in this manner
-        registerMainAPI(MovixProvider())
+        registerMainAPI(MovixClubProvider())
     }
 }

@@ -4,7 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class MovixProvider : MainAPI() {
+class MovixClubProvider : MainAPI() {
     override var mainUrl = "https://movix.club"
     override var name = "Movix"
     private val apiUrl = "https://api.movix.club"
