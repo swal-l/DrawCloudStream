@@ -36,7 +36,73 @@ class MovixClubProvider : MainAPI() {
         return newHomePageResponse(request.name, searchResults)
     }
 
-    // ... (Data Classes skipped for brevity in prompt, but kept in file) ...
+    // JSON Data Classes
+    data class MovixSearchResponse(
+        val results: List<SearchResultItem>?
+    )
+
+    data class SearchResultItem(
+        val id: Int,
+        val name: String,
+        val poster: String?,
+        val type: String?, // "animes", "movie", "ebook"
+        @JsonProperty("model_type") val modelType: String?,
+        val year: Int?,
+        @JsonProperty("tmdb_id") val tmdbId: Int?,
+        val description: String?,
+        val backdrop: String?,
+        val rating: Float?
+    )
+
+    data class SeasonResponse(
+        val success: Boolean,
+        val pagination: SeasonPagination?
+    )
+
+    data class SeasonPagination(
+        val data: List<SeasonItem>?
+    )
+
+    data class SeasonItem(
+        val id: Int,
+        val number: Int,
+        @JsonProperty("episodes_count") val episodesCount: Int?
+    )
+
+    data class EpisodeResponse(
+        val success: Boolean,
+        val pagination: EpisodePagination?
+    )
+
+    data class EpisodePagination(
+        val data: List<EpisodeItem>?
+    )
+
+    data class EpisodeItem(
+        val id: Int,
+        val name: String?,
+        val poster: String?,
+        @JsonProperty("episode_number") val episodeNumber: Int,
+        @JsonProperty("season_number") val seasonNumber: Int,
+        val description: String?,
+        @JsonProperty("primary_video") val primaryVideo: PrimaryVideo?
+    )
+
+    data class PrimaryVideo(
+        val lien: String?
+    )
+    
+    // Movie Download Response (Partial)
+    data class MovieDownloadResponse(
+        val success: Boolean,
+        val all: List<MovieDownloadItem>?
+    )
+    
+    data class MovieDownloadItem(
+        val id: Int,
+        @JsonProperty("host_name") val hostName: String?,
+        val quality: String?
+    )
 
     override suspend fun search(query: String): List<SearchResponse> {
         val url = "$apiUrl/api/search?title=$query"
