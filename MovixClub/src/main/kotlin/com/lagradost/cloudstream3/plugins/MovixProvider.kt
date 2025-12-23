@@ -13,13 +13,16 @@ class MovixClubProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie, TvType.Anime)
 
     override val mainPage = mainPageOf(
-        "2025" to "📅 Sorties 2025",
-        "2024" to "📅 Sorties 2024",
-        "series" to "📺 Séries Populaires",
-        "action" to "💥 Films d'Action",
+        "2025" to "📅 Prochainement & Nouveautés (2025)",
+        "2024" to "🔥 Films & Séries 2024",
+        "action" to "💥 Action",
         "aventure" to "🌍 Aventure",
+        "comédie" to "😂 Comédie",
+        "drame" to "🎭 Drame",
+        "epouvante-horreur" to "👻 Horreur",
+        "science-fiction" to "👽 Science-Fiction",
         "anime" to "🗾 Animes",
-        "drame" to "🎭 Drame"
+        "saison" to "📺 Saisons Récentes"
     )
 
     private val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
